@@ -1,2 +1,3 @@
-# generala
+# Generala
+
 Juego de Dados: Generala
