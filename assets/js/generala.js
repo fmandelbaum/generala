@@ -4,7 +4,8 @@ let estadoDelJuego = {
     dados: [],
     dadosSeleccionados: [],
     jugador: Math.floor(Math.random() * 2) + 1,
-    contTiros: 0
+    contTiros: 0,
+    puntajes: [[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]]
 };
 
 function tirarDado() {
@@ -52,7 +53,39 @@ function actualizarPantalla() {
     document.getElementById("tiro").innerHTML = estadoDelJuego.contTiros;
 }
 
-function anotarPuntos() {
+function anotarPuntos(juego) {
+    let celda = document.querySelector("#puntajes tbody tr:nth-of-type(" + (juego + 1) + ") td:nth-of-type(" + estadoDelJuego.jugador + ")");
+    if (!celda.classList.contains("anotado")) {
+        celda.classList.add("anotado");
+        switch (juego) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = puntos(juego + 1);
+                break;
+            case 6:
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esEscalera() ? 20 : 0;
+                break;
+            case 7:
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esFull() ? 30 : 0;
+                break;
+            case 8:
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esPoker() ? 40 : 0;
+                break;
+            case 9:
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? 50 : 0;
+                break;
+            case 10:
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? 100 : 0;
+                break;
+        }
+        celda.innerHTML = estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] === 0 ? "X" : estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego];
+        let celdaTotal = document.querySelector("#puntajes tr:nth-of-type(13)");
+        celdaTotal.innerHTML = totalPuntos(estadoDelJuego.jugador);
+    }
     [1,2,3,4,5,6].forEach(dado => { console.info(dado + "=>" + puntos(dado)); });
     console.info("escalera=>" + esEscalera());
     console.info("full=>" + esFull());
@@ -60,6 +93,10 @@ function anotarPuntos() {
     console.info("generala=>" + esGenerala());
     // TODO: Mostar tabla de puntos, y permitir al jugador anotar o tachar, y luego cambiarJugador()
     cambiarJugador();
+}
+
+function totalPuntos(jugador) {
+    
 }
 
 function cambiarJugador() {
