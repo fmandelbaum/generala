@@ -42,6 +42,8 @@ function actualizarPantalla() {
     document.getElementById("tiro").innerHTML = estadoDelJuego.contTiros;
     document.querySelectorAll("#puntajes tbody td").forEach(celda => celda.classList.remove("jugando"));
     document.querySelectorAll("#puntajes tbody td:nth-of-type(" + estadoDelJuego.jugador + ")").forEach(celda => celda.classList.add("jugando"));
+    document.querySelectorAll("#puntajes thead th").forEach(celda => celda.classList.remove("jugando"));
+    document.querySelectorAll("#puntajes thead th:nth-of-type(" + (estadoDelJuego.jugador + 1) + ")").forEach(celda => celda.classList.add("jugando"));
 }
 
 function anotarPuntos(juego) {
@@ -109,6 +111,7 @@ function quienGano() {
     let p2 = estadoDelJuego.puntajes[1].reduce((total, puntaje) => {
         return total + puntaje;
     }, 0);
+    document.querySelector("#puntajes thead th:nth-of-type(" + (p1 > p2 ? 2 : 3) + ")").classList.add("ganador");
     document.querySelectorAll("#puntajes tbody td:nth-of-type(" + (p1 > p2 ? 1 : 2) + ")").forEach(celda => celda.classList.add("ganador"));
 }
 

@@ -80,10 +80,15 @@ table {
 	font-weight: bold;
 }
 
-#puntajes tbody th.jugando,
+#puntajes thead th.jugando,
 #puntajes tbody td.jugando
 {
 	background-color: honeydew;
+}
+
+#puntajes thead th.jugando
+{
+	font-weight: bold;
 }
 
 #puntajes tbody tr:hover,
