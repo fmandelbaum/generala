@@ -55,7 +55,8 @@ function anotarPuntos(juego) {
 
     let celda = document.querySelector("#puntajes tbody tr:nth-of-type(" + (juego + 1) + ") td:nth-of-type(" + estadoDelJuego.jugador + ")");
     if (!celda.classList.contains("anotado")) {
-        celda.classList.add("anotado");
+        let generalaForzadaPorDoble = false;
+        let dobleForzadaPorGenerala = false;
         switch (juego) {
             case 0:
             case 1:
@@ -75,13 +76,44 @@ function anotarPuntos(juego) {
                 estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esPoker() ? puntosJuegoEspecial(40) : 0;
                 break;
             case 9:
-                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? puntosJuegoEspecial(50) : 0;
+                if (esGenerala()) {
+                    estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = puntosJuegoEspecial(50);
+                } else {
+                    if (document.querySelector("#puntajes tbody tr:nth-of-type(11) td:nth-of-type(" + estadoDelJuego.jugador + ")").classList.contains("anotado")) {
+                        estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = 0;
+                    } else {
+                        estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][10] = 0;
+                        dobleForzadaPorGenerala = true;
+                    }
+                }
                 break;
             case 10:
-                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? puntosJuegoEspecial(100) : 0;
+                if (!esGenerala()) {
+                    estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = 0;
+                } else {
+                    if (estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][9] > 0) {
+                        estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = puntosJuegoEspecial(100);
+                    } else {
+                        estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][9] = puntosJuegoEspecial(50);
+                        generalaForzadaPorDoble = true;
+                    }
+                }
                 break;
         }
-        celda.innerHTML = estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] === 0 ? "X" : estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego];
+        if (!generalaForzadaPorDoble && !dobleForzadaPorGenerala) {
+            celda.innerHTML = estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] === 0 ? "X" : estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego];
+            celda.classList.add("anotado");
+        } else if (generalaForzadaPorDoble) {
+            let celdaG = document.querySelector("#puntajes tbody tr:nth-of-type(10) td:nth-of-type(" + estadoDelJuego.jugador + ")");
+            celdaG.innerHTML = estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][9] === 0 ? "X" : estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][9];
+            celdaG.classList.add("anotado");
+        } else if (dobleForzadaPorGenerala) {
+            let celdaDG = document.querySelector("#puntajes tbody tr:nth-of-type(11) td:nth-of-type(" + estadoDelJuego.jugador + ")");
+            celdaDG.innerHTML = "X";
+            celdaDG.classList.add("anotado");
+        } else {
+            alert("!!! No debería ocurrir. Tengo un bug en el código !!!");
+        }
         let celdaTotal = document.querySelector("#puntajes tbody tr:nth-of-type(12) td:nth-of-type(" + estadoDelJuego.jugador + ")");
         celdaTotal.innerHTML = totalPuntos();
         cambiarJugador();
@@ -93,15 +125,9 @@ function puntosJuegoEspecial(puntosJuego) {
 }
 
 function totalPuntos() {
-    /* */
-    let total = 0;
-    estadoDelJuego.puntajes[estadoDelJuego.jugador - 1].forEach(puntaje => total += puntaje);
-    return total;
-    /*
     return estadoDelJuego.puntajes[estadoDelJuego.jugador - 1].reduce((total, puntaje) => {
         return total + puntaje;
     }, 0);
-    /**/
 }
 
 function quienGano() {
