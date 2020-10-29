@@ -24,8 +24,17 @@ function tirarDados() {
     estadoDelJuego.contTiros++;
     actualizarPantalla();
     if (estadoDelJuego.contTiros === 3) {
-        anotarPuntos();
+        forzarAnotarPuntos();
     }
+}
+
+function forzarAnotarPuntos() {
+    // Deshabilitar el botón para tirar dados
+    habilitarBotonTirar(false);
+    // Deshabilitar la posibilidad de seleccionar dados
+    document.querySelectorAll("#contenedorDados div img").forEach(img => {
+        img.onclick = null;
+    });
 }
 
 function actualizarPantalla() {
@@ -152,6 +161,18 @@ function cambiarJugador() {
     if (estadoDelJuego.jugadas === 11 * estadoDelJuego.puntajes.length) {
         juegoTerminado();
     }
+    habilitarBotonTirar(true);
+}
+
+function habilitarBotonTirar(habilitar) {
+    let boton = document.querySelector("#botonTirarDados a");
+    if (habilitar) {
+        boton.setAttribute("href", "javascript:tirarDados();"); // Funcional
+        boton.classList.remove("disabled"); // Visual
+    } else {        
+        boton.removeAttribute("href"); // Funcional
+        boton.classList.add("disabled"); // Visual
+    }
 }
 
 function dadosReset() {
@@ -186,6 +207,7 @@ function dibujarDado(i, valor, setupHandler) {
 
 function juegoTerminado() {
     quienGano();
+    habilitarBotonTirar(false);
 }
 
 function esEscalera() {
