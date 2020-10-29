@@ -5,7 +5,8 @@ let estadoDelJuego = {
     dadosSeleccionados: [],
     jugador: Math.floor(Math.random() * 2) + 1,
     contTiros: 0,
-    puntajes: [[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]]
+    puntajes: [[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]],
+    jugadas: 0
 };
 
 function tirarDado() {
@@ -29,31 +30,27 @@ function tirarDados() {
 
 function actualizarPantalla() {
     estadoDelJuego.dadosSeleccionados = [];
-    contenedorDados.innerHTML = null;
-    for (let i = 0; i < 5; i++) {
-        let dado = document.createElement("div");
-        let imgdado = document.createElement("img");
-        imgdado.setAttribute("src", "assets/img/dados" + estadoDelJuego.dados[i] + ".png");
-        imgdado.setAttribute("data-dado-index", i);
-        dado.appendChild(imgdado);
-        contenedorDados.appendChild(dado);
-
-        imgdado.onclick = evt => {
-            let dadoSeleccionado = parseInt(evt.target.getAttribute("data-dado-index"));
-            if (estadoDelJuego.dadosSeleccionados.indexOf(dadoSeleccionado) === -1) {
-                estadoDelJuego.dadosSeleccionados.push(dadoSeleccionado);
-                evt.target.classList.add("seleccionado");
-            } else {
-                estadoDelJuego.dadosSeleccionados.splice(estadoDelJuego.dadosSeleccionados.indexOf(dadoSeleccionado), 1);
-                evt.target.classList.remove("seleccionado");
-            }
-        };
+    if (estadoDelJuego.dados.length === 0) {
+        dadosReset();
+    } else {
+        contenedorDados.innerHTML = null;
+        for (let i = 0; i < 5; i++) {
+            contenedorDados.appendChild(dibujarDado(i, estadoDelJuego.dados[i], true));
+        }    
     }
     document.getElementById("turno").innerHTML = estadoDelJuego.jugador;
     document.getElementById("tiro").innerHTML = estadoDelJuego.contTiros;
+    document.querySelectorAll("#puntajes tbody td").forEach(celda => celda.classList.remove("jugando"));
+    document.querySelectorAll("#puntajes tbody td:nth-of-type(" + estadoDelJuego.jugador + ")").forEach(celda => celda.classList.add("jugando"));
 }
 
 function anotarPuntos(juego) {
+    [1,2,3,4,5,6].forEach(dado => { console.info(dado + "=>" + puntos(dado)); });
+    console.info("escalera=>" + esEscalera());
+    console.info("full=>" + esFull());
+    console.info("poker=>" + esPoker());
+    console.info("generala=>" + esGenerala());
+
     let celda = document.querySelector("#puntajes tbody tr:nth-of-type(" + (juego + 1) + ") td:nth-of-type(" + estadoDelJuego.jugador + ")");
     if (!celda.classList.contains("anotado")) {
         celda.classList.add("anotado");
@@ -67,36 +64,52 @@ function anotarPuntos(juego) {
                 estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = puntos(juego + 1);
                 break;
             case 6:
-                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esEscalera() ? 20 : 0;
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esEscalera() ? puntosJuegoEspecial(20) : 0;
                 break;
             case 7:
-                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esFull() ? 30 : 0;
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esFull() ? puntosJuegoEspecial(30) : 0;
                 break;
             case 8:
-                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esPoker() ? 40 : 0;
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esPoker() ? puntosJuegoEspecial(40) : 0;
                 break;
             case 9:
-                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? 50 : 0;
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? puntosJuegoEspecial(50) : 0;
                 break;
             case 10:
-                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? 100 : 0;
+                estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] = esGenerala() ? puntosJuegoEspecial(100) : 0;
                 break;
         }
         celda.innerHTML = estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego] === 0 ? "X" : estadoDelJuego.puntajes[estadoDelJuego.jugador - 1][juego];
-        let celdaTotal = document.querySelector("#puntajes tr:nth-of-type(13)");
-        celdaTotal.innerHTML = totalPuntos(estadoDelJuego.jugador);
+        let celdaTotal = document.querySelector("#puntajes tbody tr:nth-of-type(12) td:nth-of-type(" + estadoDelJuego.jugador + ")");
+        celdaTotal.innerHTML = totalPuntos();
+        cambiarJugador();
     }
-    [1,2,3,4,5,6].forEach(dado => { console.info(dado + "=>" + puntos(dado)); });
-    console.info("escalera=>" + esEscalera());
-    console.info("full=>" + esFull());
-    console.info("poker=>" + esPoker());
-    console.info("generala=>" + esGenerala());
-    // TODO: Mostar tabla de puntos, y permitir al jugador anotar o tachar, y luego cambiarJugador()
-    cambiarJugador();
 }
 
-function totalPuntos(jugador) {
-    
+function puntosJuegoEspecial(puntosJuego) {
+    return estadoDelJuego.contTiros === 1 ? puntosJuego + 5 : puntosJuego;
+}
+
+function totalPuntos() {
+    /* */
+    let total = 0;
+    estadoDelJuego.puntajes[estadoDelJuego.jugador - 1].forEach(puntaje => total += puntaje);
+    return total;
+    /*
+    return estadoDelJuego.puntajes[estadoDelJuego.jugador - 1].reduce((total, puntaje) => {
+        return total + puntaje;
+    }, 0);
+    /**/
+}
+
+function quienGano() {
+    let p1 = estadoDelJuego.puntajes[0].reduce((total, puntaje) => {
+        return total + puntaje;
+    }, 0);
+    let p2 = estadoDelJuego.puntajes[1].reduce((total, puntaje) => {
+        return total + puntaje;
+    }, 0);
+    document.querySelectorAll("#puntajes tbody td:nth-of-type(" + (p1 > p2 ? 1 : 2) + ")").forEach(celda => celda.classList.add("ganador"));
 }
 
 function cambiarJugador() {
@@ -105,8 +118,45 @@ function cambiarJugador() {
     estadoDelJuego.dados = [];
     estadoDelJuego.dadosSeleccionados = [];
     estadoDelJuego.jugador = estadoDelJuego.jugador === 2 ? 1 : 2;
-    // "Borrar" dados de jugador anterior
+    estadoDelJuego.jugadas++;
+    actualizarPantalla();
+    if (estadoDelJuego.jugadas === 11 * estadoDelJuego.puntajes.length) {
+        juegoTerminado();
+    }
+}
+
+function dadosReset() {
     contenedorDados.innerHTML = null;
+    for (let i = 0; i < 5; i++) {
+        contenedorDados.appendChild(dibujarDado(i, 0));
+    }
+}
+
+function dibujarDado(i, valor, setupHandler) {
+    let dado = document.createElement("div");
+    let imgdado = document.createElement("img");
+    imgdado.setAttribute("src", "assets/img/dados" + valor + ".png");
+    imgdado.setAttribute("data-dado-index", i);
+    dado.appendChild(imgdado);
+
+    if (setupHandler) {
+        imgdado.onclick = evt => {
+            let dadoSeleccionado = parseInt(evt.target.getAttribute("data-dado-index"));
+            if (estadoDelJuego.dadosSeleccionados.indexOf(dadoSeleccionado) === -1) {
+                estadoDelJuego.dadosSeleccionados.push(dadoSeleccionado);
+                evt.target.classList.add("seleccionado");
+            } else {
+                estadoDelJuego.dadosSeleccionados.splice(estadoDelJuego.dadosSeleccionados.indexOf(dadoSeleccionado), 1);
+                evt.target.classList.remove("seleccionado");
+            }
+        };
+    }
+
+    return dado;
+}
+
+function juegoTerminado() {
+    quienGano();
 }
 
 function esEscalera() {
