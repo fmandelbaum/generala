@@ -50,18 +50,29 @@ function resaltarJuegosPosibles(resaltar) {
     if (!resaltar) {
         document.querySelectorAll("#puntajes tbody tr th").forEach(th => th.classList.remove("puntaje"));
     } else {
-        let selector;
-        if (esEscalera()) {
-            selector = "#puntajes tbody tr:nth-of-type(7) th";
-        } else if (esFull()) {
-            selector = "#puntajes tbody tr:nth-of-type(8) th";
-        } else if (esPoker()) {
-            selector = "#puntajes tbody tr:nth-of-type(9) th";
-        } else if (esGenerala()) {
-            selector = "#puntajes tbody tr:nth-of-type(10) th";
+        let selector = "";
+        [1,2,3,4,5,6].forEach(dado => {
+            let celda = document.querySelector("#puntajes tbody tr:nth-of-type(" + dado + ") td.jugando");
+            if (estadoDelJuego.dados.includes(dado) && !celda.classList.contains("anotado")) {
+                selector += "#puntajes tbody tr:nth-of-type(" + dado + ") th,";
+            }
+        });
+        if (esEscalera() && !document.querySelector("#puntajes tbody tr:nth-of-type(7) td.jugando").classList.contains("anotado")) {
+            selector += "#puntajes tbody tr:nth-of-type(7) th,";
         }
-        if (selector) {
-            document.querySelector(selector).classList.add("puntaje");
+        if (esFull() && !document.querySelector("#puntajes tbody tr:nth-of-type(8) td.jugando").classList.contains("anotado")) {
+            selector += "#puntajes tbody tr:nth-of-type(8) th,";
+        }
+        if (esPoker() && !document.querySelector("#puntajes tbody tr:nth-of-type(9) td.jugando").classList.contains("anotado")) {
+            selector += "#puntajes tbody tr:nth-of-type(9) th,";
+        }
+        if (esGenerala() && !document.querySelector("#puntajes tbody tr:nth-of-type(10) td.jugando").classList.contains("anotado")) {
+            // TODO: Si tengo anotada la generala, resaltar la doble
+            selector += "#puntajes tbody tr:nth-of-type(10) th,";
+        }
+        selector = selector.substring(0, selector.length - 1);
+        if (selector.length > 0) {
+            document.querySelectorAll(selector).forEach(th => th.classList.add("puntaje"));
         }
     }
 }
