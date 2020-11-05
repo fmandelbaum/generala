@@ -104,6 +104,29 @@ table {
 	color: white;
 }
 
+#botonTirarDados,
+#botonReiniciarJuego
+{
+	width: 6em;
+	height: 2em;
+	line-height: 2em;
+	padding: 0.25em;
+	margin: 0.5em;
+	text-align: center;
+	display: inline-block;
+
+	background-color: indigo;
+	color: white;
+	font-weight: bold;
+
+	border-radius: 10px;
+}
+
+#turnos
+{
+	margin: 1em;
+}
+
 .disabled
 {
 	cursor: not-allowed;

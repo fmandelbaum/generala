@@ -8,11 +8,10 @@
         <link rel="stylesheet" href="assets/css/style.css">
     </head>
 
-<body onload="actualizarPantalla();">
-    <div id="botonTirarDados">
-        <a href="javascript:tirarDados();">Tirar Dados</a>
-    </div>
-    <div>Jugador <span id="turno"></span>, tiro <span id="tiro"></span></div>
+<body onload="iniciarJuego();">
+    <a id="botonTirarDados" href="javascript:tirarDados();">Tirar Dados</a>
+    <a id="botonReiniciarJuego" href="javascript:iniciarJuego();">Reiniciar</a>
+    <div id="turnos">Jugador <span id="turno"></span>, tiro <span id="tiro"></span></div>
     <div id="contenedorDados"></div>
     <table id="puntajes">
         <thead>

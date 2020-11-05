@@ -1,13 +1,29 @@
 let contenedorDados = document.getElementById("contenedorDados");
 
-let estadoDelJuego = {
-    dados: [],
-    dadosSeleccionados: [],
-    jugador: Math.floor(Math.random() * 2) + 1,
-    contTiros: 0,
-    puntajes: [[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]],
-    jugadas: 0
-};
+let estadoDelJuego;
+
+function iniciarJuego() {
+    estadoDelJuego = {
+        dados: [],
+        dadosSeleccionados: [],
+        jugador: Math.floor(Math.random() * 2) + 1,
+        contTiros: 0,
+        puntajes: [[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]],
+        jugadas: 0
+    };
+    limpiarVisualPuntajes();
+    actualizarPantalla();
+    habilitarBoton(false, "#botonReiniciarJuego", "iniciarJuego");
+    habilitarBoton(true, "#botonTirarDados", "tirarDados");
+}
+
+function limpiarVisualPuntajes() {
+    document.querySelectorAll("#puntajes tbody td").forEach(celda => {
+        celda.classList.remove("jugando", "ganador");
+        celda.innerHTML = "";
+    });
+    document.querySelectorAll("#puntajes thead th").forEach(celda => celda.classList.remove("jugando", "ganador"));
+}
 
 function tirarDado() {
     return Math.floor(Math.random() * 6) + 1;
@@ -30,7 +46,7 @@ function tirarDados() {
 
 function forzarAnotarPuntos() {
     // Deshabilitar el botón para tirar dados
-    habilitarBotonTirar(false);
+    habilitarBoton(false, "#botonTirarDados", "tirarDados");
     // Deshabilitar la posibilidad de seleccionar dados
     document.querySelectorAll("#contenedorDados div img").forEach(img => {
         img.onclick = null;
@@ -161,15 +177,15 @@ function cambiarJugador() {
     if (estadoDelJuego.jugadas === 11 * estadoDelJuego.puntajes.length) {
         juegoTerminado();
     }
-    habilitarBotonTirar(true);
+    habilitarBoton(true, "#botonTirarDados", "tirarDados");
 }
 
-function habilitarBotonTirar(habilitar) {
-    let boton = document.querySelector("#botonTirarDados a");
+function habilitarBoton(habilitar, selBoton, nombreFunc) {
+    let boton = document.querySelector(selBoton);
     if (habilitar) {
-        boton.setAttribute("href", "javascript:tirarDados();"); // Funcional
+        boton.setAttribute("href", "javascript:" + nombreFunc + "();"); // Funcional
         boton.classList.remove("disabled"); // Visual
-    } else {        
+    } else {
         boton.removeAttribute("href"); // Funcional
         boton.classList.add("disabled"); // Visual
     }
@@ -207,7 +223,8 @@ function dibujarDado(i, valor, setupHandler) {
 
 function juegoTerminado() {
     quienGano();
-    habilitarBotonTirar(false);
+    habilitarBoton(false, "#botonTirarDados", "tirarDados");
+    habilitarBoton(true, "#botonReiniciarJuego", "iniciarJuego");
 }
 
 function esEscalera() {
