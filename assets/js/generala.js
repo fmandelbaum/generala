@@ -30,6 +30,7 @@ function tirarDado() {
 }
 
 function tirarDados() {
+    resaltarJuegosPosibles();
     if (estadoDelJuego.dadosSeleccionados.length === 0) {
         estadoDelJuego.dadosSeleccionados = [0, 1, 2, 3, 4];
     }
@@ -39,8 +40,29 @@ function tirarDados() {
     estadoDelJuego.dados.sort((a, b) => { return a - b; });
     estadoDelJuego.contTiros++;
     actualizarPantalla();
+    resaltarJuegosPosibles(true);
     if (estadoDelJuego.contTiros === 3) {
         forzarAnotarPuntos();
+    }
+}
+
+function resaltarJuegosPosibles(resaltar) {
+    if (!resaltar) {
+        document.querySelectorAll("#puntajes tbody tr th").forEach(th => th.classList.remove("puntaje"));
+    } else {
+        let selector;
+        if (esEscalera()) {
+            selector = "#puntajes tbody tr:nth-of-type(7) th";
+        } else if (esFull()) {
+            selector = "#puntajes tbody tr:nth-of-type(8) th";
+        } else if (esPoker()) {
+            selector = "#puntajes tbody tr:nth-of-type(9) th";
+        } else if (esGenerala()) {
+            selector = "#puntajes tbody tr:nth-of-type(10) th";
+        }
+        if (selector) {
+            document.querySelector(selector).classList.add("puntaje");
+        }
     }
 }
 
@@ -72,12 +94,6 @@ function actualizarPantalla() {
 }
 
 function anotarPuntos(juego) {
-    [1,2,3,4,5,6].forEach(dado => { console.info(dado + "=>" + puntos(dado)); });
-    console.info("escalera=>" + esEscalera());
-    console.info("full=>" + esFull());
-    console.info("poker=>" + esPoker());
-    console.info("generala=>" + esGenerala());
-
     let celda = document.querySelector("#puntajes tbody tr:nth-of-type(" + (juego + 1) + ") td:nth-of-type(" + estadoDelJuego.jugador + ")");
     if (!celda.classList.contains("anotado")) {
         let generalaForzadaPorDoble = false;
@@ -141,6 +157,7 @@ function anotarPuntos(juego) {
         }
         let celdaTotal = document.querySelector("#puntajes tbody tr:nth-of-type(12) td:nth-of-type(" + estadoDelJuego.jugador + ")");
         celdaTotal.innerHTML = totalPuntos();
+        resaltarJuegosPosibles();
         cambiarJugador();
     }
 }

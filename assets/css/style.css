@@ -104,6 +104,12 @@ table {
 	color: white;
 }
 
+#puntajes .puntaje
+{
+	background-color: darkseagreen;
+	color: black;
+}
+
 #botonTirarDados,
 #botonReiniciarJuego
 {
